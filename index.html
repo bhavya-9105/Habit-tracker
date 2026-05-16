@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gamified Habit Tracker</title>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <!-- Auth / Landing View -->
+    <section id="landing-view" class="view-state active">
+        <div class="landing-content glass-card">
+            <h1 class="brand-title"><i class="fa-solid fa-layer-group"></i> NexusHabit</h1>
+            <p class="tagline">Level up your life. One streak at a time.</p>
+            
+            <div class="neural-marquee">
+                <p class="quote">"Discipline is the bridge between cellular potential and digital empire."</p>
+                <p class="quote">"Your habits are code; rewrite your baseline runtime state."</p>
+                <p class="quote">"The engine of consistency runs on small, daily execution units."</p>
+            </div>
+
+            <div class="auth-buttons">
+                <button class="btn auth-btn" id="btn-google">
+                    <i class="fa-brands fa-google"></i> Continue with Google
+                </button>
+                <button class="btn auth-btn" id="btn-apple">
+                    <i class="fa-brands fa-apple"></i> Continue with Apple
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Dashboard View -->
+    <main id="dashboard-view" class="view-state hidden">
+        <div class="dashboard-container">
+            <!-- Operator Profile Terminal -->
+            <header class="profile-header glass-card terminal-block">
+                <div class="terminal-top">
+                    <div class="profile-info">
+                        <div class="avatar"><i class="fa-solid fa-user-astronaut"></i></div>
+                        <div class="user-details">
+                            <h2>Agent Alpha</h2>
+                            <p class="level-indicator">Level <span id="user-level">1</span></p>
+                            <p class="class-title" id="user-class-title">Carbon Novice</p>
+                        </div>
+                    </div>
+                    <div class="wallet-container">
+                        <span class="wallet-label">WALLET</span>
+                        <div class="wallet-balance">[ 🪙 <span id="balance-bytecoins">0</span> ByteCoins ]</div>
+                    </div>
+                </div>
+                <div class="terminal-bottom">
+                    <div class="micro-stats">
+                        <div class="stat-badge"><i class="fa-solid fa-dumbbell"></i> STR: <span id="stat-str">0</span></div>
+                        <div class="stat-badge"><i class="fa-solid fa-brain"></i> INT: <span id="stat-int">0</span></div>
+                        <div class="stat-badge"><i class="fa-solid fa-om"></i> FOC: <span id="stat-foc">0</span></div>
+                    </div>
+                    <div class="xp-container">
+                        <div class="xp-labels">
+                            <span>XP Progress</span>
+                            <span id="xp-text">0 / 100</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="xp-fill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stats Banner -->
+            <section class="stats-banner">
+                <div class="stat-card glass-card">
+                    <i class="fa-solid fa-chart-pie stat-icon indigo"></i>
+                    <div class="stat-data">
+                        <span class="stat-value" id="completion-rate">0%</span>
+                        <span class="stat-label">Daily Completion</span>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <i class="fa-solid fa-trophy stat-icon emerald"></i>
+                    <div class="stat-data">
+                        <span class="stat-value" id="lifetime-completions">0</span>
+                        <span class="stat-label">Lifetime Completions</span>
+                    </div>
+                </div>
+                <div class="stat-card glass-card canvas-card">
+                    <canvas id="vectorChart" width="150" height="150"></canvas>
+                </div>
+            </section>
+
+            <!-- Dashboard SPA Navigation -->
+            <nav class="dashboard-nav glass-card">
+                <button class="nav-btn active" data-target="daily-deck">[ Daily Deck ]</button>
+                <button class="nav-btn" data-target="weekly-matrix">[ Weekly Analytics Matrix ]</button>
+                <button class="nav-btn" data-target="monthly-grid">[ Monthly Grid View ]</button>
+                <button class="nav-btn" data-target="achievements-tab">[ Achievement Badges ]</button>
+                <button class="nav-btn shop-btn" data-target="rewards-shop">[ 🛒 Rewards Matrix Shop ]</button>
+            </nav>
+
+            <!-- Tab: Daily Deck -->
+            <div id="daily-deck" class="tab-content active-tab">
+                <!-- Habit Creation Form -->
+                <section class="habit-creation glass-card">
+                    <form id="new-habit-form">
+                    <input type="text" id="habit-name" placeholder="What habit are we building?" required>
+                    <select id="habit-category" required>
+                        <option value="" disabled selected>Category</option>
+                        <option value="Fitness">Fitness 🏃</option>
+                        <option value="Cognition">Cognition 🧠</option>
+                        <option value="Code">Code 💻</option>
+                        <option value="Mindfulness">Mindfulness 🧘</option>
+                    </select>
+                    <button type="submit" class="btn primary-btn"><i class="fa-solid fa-plus"></i> Add</button>
+                </form>
+            </section>
+
+            <!-- Habits Grid -->
+            <section class="habits-grid" id="habits-container">
+                <!-- Habit Cards dynamically rendered here -->
+            </section>
+
+                <section class="matrix-section glass-card">
+                    <h3>Neural Consistency Matrix</h3>
+                    <div class="matrix-grid" id="consistency-matrix">
+                        <!-- Matrix blocks dynamically rendered here -->
+                    </div>
+                </section>
+            </div> <!-- End Tab: Daily Deck -->
+
+            <!-- Tab: Weekly Matrix -->
+            <div id="weekly-matrix" class="tab-content hidden-tab">
+                <section class="weekly-section glass-card">
+                    <h3>7-Day Analytics Matrix</h3>
+                    <div id="weekly-matrix-container" class="weekly-matrix-container">
+                        <!-- Rendered in JS -->
+                    </div>
+                </section>
+            </div> <!-- End Tab: Weekly Matrix -->
+
+            <!-- Tab: Monthly Grid -->
+            <div id="monthly-grid" class="tab-content hidden-tab">
+                <section class="monthly-section glass-card">
+                    <div class="monthly-header">
+                        <button id="prev-month" class="btn icon-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                        <h3 id="current-month-display">Month Year</h3>
+                        <button id="next-month" class="btn icon-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                    <div class="monthly-grid-container" id="monthly-grid-container">
+                        <!-- Rendered in JS -->
+                    </div>
+                </section>
+            </div> <!-- End Tab: Monthly Grid -->
+
+            <!-- Tab: Achievements -->
+            <div id="achievements-tab" class="tab-content hidden-tab">
+                <section class="achievements-section glass-card">
+                    <h3>Unlocked Achievements</h3>
+                    <div class="badge-grid" id="badge-grid">
+                        <div class="badge-card locked glass-card" id="badge-first-commit">
+                            <i class="fa-solid fa-code badge-icon"></i>
+                            <h4>First Code Commit</h4>
+                            <p>Unlocked on very first habit completion.</p>
+                            <span class="unlock-timestamp"></span>
+                        </div>
+                        <div class="badge-card locked glass-card" id="badge-pyromaniac">
+                            <i class="fa-solid fa-fire-flame-curved badge-icon"></i>
+                            <h4>Pyromaniac</h4>
+                            <p>Achieve a 7-day active streak.</p>
+                            <span class="unlock-timestamp"></span>
+                        </div>
+                        <div class="badge-card locked glass-card" id="badge-ascended">
+                            <i class="fa-solid fa-angles-up badge-icon"></i>
+                            <h4>Ascended Status</h4>
+                            <p>Reach Level 3.</p>
+                            <span class="unlock-timestamp"></span>
+                        </div>
+                        <div class="badge-card locked glass-card" id="badge-flawless">
+                            <i class="fa-solid fa-gem badge-icon"></i>
+                            <h4>Flawless Execution</h4>
+                            <p>100% daily completion rate.</p>
+                            <span class="unlock-timestamp"></span>
+                        </div>
+                    </div>
+                </section>
+            </div> <!-- End Tab: Achievements -->
+
+            <!-- Tab: Rewards Shop -->
+            <div id="rewards-shop" class="tab-content hidden-tab">
+                <section class="rewards-section glass-card">
+                    <h3>Rewards Matrix Shop</h3>
+                    <p class="rewards-desc">Upgrade your reality with hard-earned ByteCoins.</p>
+                    <div class="shop-grid" id="shop-grid">
+                        <div class="shop-item glass-card">
+                            <i class="fa-solid fa-shield-halved item-icon"></i>
+                            <div class="item-info">
+                                <h4>Streak Freeze Matrix Shield</h4>
+                                <p>Protect your streak from a missed day.</p>
+                                <span class="item-cost">50 ByteCoins</span>
+                            </div>
+                            <button class="btn purchase-btn" data-item="streak-freeze" data-cost="50">Purchase</button>
+                        </div>
+                        <div class="shop-item glass-card">
+                            <i class="fa-solid fa-bolt item-icon"></i>
+                            <div class="item-info">
+                                <h4>Neon Overdrive Themes Pack</h4>
+                                <p>Unlock the secondary CSS skin.</p>
+                                <span class="item-cost">100 ByteCoins</span>
+                            </div>
+                            <button class="btn purchase-btn" data-item="neon-theme" data-cost="100">Purchase</button>
+                        </div>
+                        <div class="shop-item glass-card">
+                            <i class="fa-solid fa-robot item-icon"></i>
+                            <div class="item-info">
+                                <h4>AI Coach Priority Token</h4>
+                                <p>Priority processing for the neural coach.</p>
+                                <span class="item-cost">25 ByteCoins</span>
+                            </div>
+                            <button class="btn purchase-btn" data-item="ai-token" data-cost="25">Purchase</button>
+                        </div>
+                    </div>
+                </section>
+            </div> <!-- End Tab: Rewards Shop -->
+
+            <!-- Utilities Console -->
+            <section class="utilities-console glass-card">
+                <h3>Telemetry Interface</h3>
+                <div class="utility-actions">
+                    <button class="btn secondary-btn" id="btn-export-profile"><i class="fa-solid fa-download"></i> Export Telemetry Profile</button>
+                    <label for="import-file" class="btn secondary-btn import-label">
+                        <i class="fa-solid fa-upload"></i> Import Telemetry Profile
+                    </label>
+                    <input type="file" id="import-file" accept=".json" class="hidden" style="display: none;">
+                </div>
+            </section>
+        </div>
+
+        <!-- AI Coach Drawer -->
+        <div id="ai-coach-drawer" class="drawer glass-card">
+            <div class="drawer-header" id="drawer-toggle">
+                <div class="header-title">
+                    <i class="fa-solid fa-robot"></i> AI Coach
+                    <div id="ai-notification-dot" class="hidden"></div>
+                </div>
+                <i class="fa-solid fa-chevron-up toggle-icon"></i>
+            </div>
+            <div class="drawer-body">
+                <div class="persona-selector">
+                    <span class="persona-label">SELECT NEURAL TRAINER CORE</span>
+                    <select id="coach-persona" class="glass-input">
+                        <option value="drill_sergeant">The Drill Sergeant</option>
+                        <option value="zen_mentor" selected>The Zen Mentor</option>
+                        <option value="data_scientist">The Data Scientist</option>
+                    </select>
+                </div>
+                <div class="chat-window" id="chat-window">
+                    <div class="message ai-message">Greetings! I am your AI Coach. Ready to conquer today?</div>
+                </div>
+                <div class="chat-input-wrapper">
+                    <input type="text" id="chat-input" placeholder="Ask for advice...">
+                    <button id="send-chat" class="btn icon-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Level Up Overlay -->
+        <div id="level-up-overlay" class="hidden">
+            <div class="overlay-content">
+                <h1 class="level-up-text">LEVEL UP!</h1>
+                <p>You have reached Level <span id="new-level-display">2</span></p>
+                <button id="close-overlay" class="btn primary-btn">Awesome!</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="supabase-config.js"></script>
+    <script src="ai-coach.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
